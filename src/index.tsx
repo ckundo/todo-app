@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App items={JSON.parse(localStorage.getItem('items') as string) ?? []} />
   </React.StrictMode>,
   document.getElementById('root')
 );
