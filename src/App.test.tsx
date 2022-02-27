@@ -1,29 +1,46 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from './App';
 
-test("renders heading", () => {
-  render(<App items={[]} />);
-  const headingEl = screen.getByText(/To Do/i);
-  expect(headingEl).toBeInTheDocument();
-});
-
 describe("list view", () => {
-  test("renders a list of items", () => {
-    render(<App items={['hello', 'world']} />);
-    const listItems = screen.getAllByRole('listitem');
-    expect(listItems).toHaveLength(2)
+  beforeEach(() => {
+    jest.useFakeTimers();
   });
 
-  test("add an item to the list", () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test("renders heading", () => {
     render(<App items={[]} />);
-    const addButton = screen.getByText('Add item');
-    const itemText = screen.getByLabelText('New item');
+    jest.runAllTimers();
 
-    fireEvent.change(itemText, { value: 'Create an example todo!' })
+    const headingEl = screen.getByText(/To Do/i);
+    expect(headingEl).toBeInTheDocument();
+  });
+
+  test("renders a list of items", () => {
+    render(<App items={["hello", "world"]} />);
+    jest.runAllTimers();
+
+    const listItems = screen.getAllByRole("listitem");
+    expect(listItems).toHaveLength(2);
+  });
+
+  test("add an item to the list", async () => {
+    render(<App items={[]} />);
+    jest.runAllTimers();
+
+    const addButton = screen.getByText("Add item");
+    const itemText = screen.getByLabelText("New item");
+
+    fireEvent.change(itemText, { value: "Create an example todo!" });
     fireEvent.click(addButton);
+    jest.runAllTimers();
 
-    const listItems = screen.getAllByRole('listitem');
-    expect(listItems).toHaveLength(1)
+    await waitFor(() => {
+      const listItems = screen.getAllByRole("listitem");
+      expect(listItems).toHaveLength(1);
+    });
   });
 
   test("edits an item in the list", () => {});
